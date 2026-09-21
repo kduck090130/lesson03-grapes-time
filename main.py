@@ -90,9 +90,38 @@ st.caption("💡 이 그래프로 알 수 있는 것: *(여기에 한 문장으�
 st.divider()
 
 # ==============================================================
-# 구역 3. (다음 그래프를 위한 자리 — 추가 예정)
+# 구역 3. 날짜별 10위권 일관객 합계
 # ==============================================================
-st.header("그래프 3. (추가 예정)")
-st.info("다음 그래프가 이 구역에 추가될 예정입니다.")
+st.header("그래프 3. 날짜별 10위권 일관객 합계")
+
+daily_total = df.groupby("날짜")["일관객"].sum().reset_index()
+daily_total.columns = ["날짜", "합계관객"]
+
+top3_days = daily_total.sort_values("합계관객", ascending=False).head(3)
+
+fig3 = px.area(
+    daily_total,
+    x="날짜",
+    y="합계관객",
+    title="날짜별 10위권 일일 관객수 합계",
+    labels={"날짜": "날짜", "합계관객": "일일 관객수 합계"},
+)
+fig3.update_traces(
+    hovertemplate="날짜: %{x|%Y-%m-%d}<br>합계 관객수: %{y:,}명<extra></extra>"
+)
+
+for _, row in top3_days.iterrows():
+    fig3.add_scatter(
+        x=[row["날짜"]],
+        y=[row["합계관객"]],
+        mode="markers+text",
+        marker=dict(size=10, color="red"),
+        text=[row["날짜"].strftime("%Y-%m-%d")],
+        textposition="top center",
+        showlegend=False,
+        hovertemplate="날짜: %{x|%Y-%m-%d}<br>합계 관객수: %{y:,}명<extra>상위 3일</extra>",
+    )
+
+st.plotly_chart(fig3, use_container_width=True)
 
 st.caption("💡 이 그래프로 알 수 있는 것: *(여기에 한 문장으로 적어보세요.)*")
