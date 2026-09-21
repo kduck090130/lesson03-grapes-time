@@ -125,3 +125,38 @@ for _, row in top3_days.iterrows():
 st.plotly_chart(fig3, use_container_width=True)
 
 st.caption("💡 이 그래프로 알 수 있는 것: *(여기에 한 문장으로 적어보세요.)*")
+
+st.divider()
+
+# ==============================================================
+# 구역 4. 일관객 합계 TOP 10 영화
+# ==============================================================
+st.header("그래프 4. 일관객 합계 TOP 10 영화")
+
+movie_summary = (
+    df.groupby("영화명")
+    .agg(합계관객=("일관객", "sum"), 순위진입일수=("날짜", "count"))
+    .reset_index()
+)
+top10_movies = movie_summary.sort_values("합계관객", ascending=False).head(10)
+
+fig4 = px.bar(
+    top10_movies,
+    x="합계관객",
+    y="영화명",
+    orientation="h",
+    custom_data=["순위진입일수"],
+    title="일관객 합계 TOP 10 영화",
+    labels={"합계관객": "일관객 합계", "영화명": "영화"},
+)
+fig4.update_traces(
+    hovertemplate=(
+        "영화: %{y}<br>일관객 합계: %{x:,}명"
+        "<br>10위권 진입 일수: %{customdata[0]}일<extra></extra>"
+    )
+)
+fig4.update_yaxes(autorange="reversed")  # 관객 많은 영화가 위로 오도록
+
+st.plotly_chart(fig4, use_container_width=True)
+
+st.caption("💡 이 그래프로 알 수 있는 것: *(여기에 한 문장으로 적어보세요.)*")
